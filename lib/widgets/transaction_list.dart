@@ -18,41 +18,54 @@ class TransactionList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 450,  // to make it fix on the screen // ListView needs height and Container!
-      child: ListView.builder(  //was Column()  // ListView = Column + SingleChildScrollView
-        itemCount: transactions.length,
-        itemBuilder: (context, index) {
-           // we dont need .map.toList() anymore because itemBuilder and itemCount
-          return Card(
-            child: Row(
-              children: <Widget>[
-                // Price widget
-                Container(
-                  margin: EdgeInsets.symmetric( vertical: 20, horizontal: 15 ),
-                  child: Text(
-                    '\$${transactions[index].amount.toStringAsFixed(2)}',  
-                    // $ 69.99999 -> $ 70.00 (fixed 2 fraction digits) 
-                    // $ should be backslashed to can be shown
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Colors.purple
-                    ), ),
-                  decoration: BoxDecoration( border: Border.all(color: Colors.purple, width: 2, )),
-                  padding: EdgeInsets.all(10),
-                ),
-                
-                // Title and date widget
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, // make content to the left
-                  children: <Widget>[
-                    Text(transactions[index].title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-                    Text( DateFormat.yMMMd().format(transactions[index].date), style: TextStyle( color: Colors.grey ), ),
-                ],)
-              ],
+      child: transactions.isEmpty 
+        ? Column(
+            children: <Widget>[
+            Text(
+              'No transactions added yet!',
+              style: Theme.of(context).textTheme.title,
             ),
-          );  //end of return with semicolon
-        },  // itemBuilder is REQUIRED in ListView.builder
-      ),
+            SizedBox(height: 20,),  //SizedBox = separator
+            Container(
+              height: 200,
+              child: Image.asset('assets/images/waiting.png', fit: BoxFit.cover,))  // BoxFit reflect to height:200
+            ],
+          ) 
+        : ListView.builder(  //was Column()  // ListView = Column + SingleChildScrollView
+          itemCount: transactions.length,
+          itemBuilder: (context, index) {
+            // we dont need .map.toList() anymore because itemBuilder and itemCount
+            return Card(
+              child: Row(
+                children: <Widget>[
+                  // Price widget
+                  Container(
+                    margin: EdgeInsets.symmetric( vertical: 20, horizontal: 15 ),
+                    child: Text(
+                      '\$${transactions[index].amount.toStringAsFixed(2)}',  
+                      // $ 69.99999 -> $ 70.00 (fixed 2 fraction digits) 
+                      // $ should be backslashed to can be shown
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Theme.of(context).primaryColorDark
+                      ), ),
+                    decoration: BoxDecoration( border: Border.all(color: Theme.of(context).primaryColorDark, width: 2, )),
+                    padding: EdgeInsets.all(10),
+                  ),
+                  
+                  // Title and date widget
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start, // make content to the left
+                    children: <Widget>[
+                      Text(transactions[index].title, style: Theme.of(context).textTheme.title,),
+                      Text( DateFormat.yMMMd().format(transactions[index].date), style: TextStyle( color: Theme.of(context).primaryColorDark ), ),
+                  ],)
+                ],
+              ),
+            );  //end of return with semicolon
+          },  // itemBuilder is REQUIRED in ListView.builder
+        ),
     );
   }
 }
