@@ -35,27 +35,26 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Flutter App'),
       ),
-      body: SingleChildScrollView(  // To implement scrolling functionality
-        child: Column(
-          // mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Container(
-              width: double.infinity,
-              child: Card(
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.blue,
-                  child: Text('CHART!')
+      body: SingleChildScrollView(  // When the phone is roated, the screen can be scrolled correctly
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Container(
+                width: double.infinity,
+                child: Card(
+                  child: Container(
+                    width: double.infinity,
+                    color: Colors.blue,
+                    child: Text('CHART!')
+                  ),
+                  elevation: 10,
                 ),
-                elevation: 10,
               ),
-            ),
-            UserTransactions()  // a Column()
-
-          ],
-        ),
-      )
+              UserTransactions()  // a Column()
+            ],
+          ),
+      ),
     );
   }
 }
