@@ -6,8 +6,9 @@ import 'package:expenses/models/transaction.dart';  //Transaction
 class TransactionList extends StatelessWidget {
   
   final List<Transaction> transactions;
+  final Function deleteTransaction;
 
-  TransactionList(this.transactions); //constructor
+  TransactionList(this.transactions, this.deleteTransaction); //constructor
 
   // final List<Transaction> _userTransaction = [
   //   Transaction( id : 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now() ),
@@ -19,6 +20,7 @@ class TransactionList extends StatelessWidget {
     return Container(
       height: 450,  // to make it fix on the screen // ListView needs height and Container!
       child: transactions.isEmpty 
+        // BIG ZZZ PICTURE
         ? Column(
             children: <Widget>[
             Text(
@@ -31,39 +33,72 @@ class TransactionList extends StatelessWidget {
               child: Image.asset('assets/images/waiting.png', fit: BoxFit.cover,))  // BoxFit reflect to height:200
             ],
           ) 
+
+        // If there is transaction(s)
         : ListView.builder(  //was Column()  // ListView = Column + SingleChildScrollView
           itemCount: transactions.length,
           itemBuilder: (context, index) {
-            // we dont need .map.toList() anymore because itemBuilder and itemCount
             return Card(
-              child: Row(
-                children: <Widget>[
-                  // Price widget
-                  Container(
-                    margin: EdgeInsets.symmetric( vertical: 20, horizontal: 15 ),
-                    child: Text(
-                      '\$${transactions[index].amount.toStringAsFixed(2)}',  
-                      // $ 69.99999 -> $ 70.00 (fixed 2 fraction digits) 
-                      // $ should be backslashed to can be shown
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Theme.of(context).primaryColorDark
-                      ), ),
-                    decoration: BoxDecoration( border: Border.all(color: Theme.of(context).primaryColorDark, width: 2, )),
-                    padding: EdgeInsets.all(10),
-                  ),
-                  
-                  // Title and date widget
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // make content to the left
-                    children: <Widget>[
-                      Text(transactions[index].title, style: Theme.of(context).textTheme.title,),
-                      Text( DateFormat.yMMMd().format(transactions[index].date), style: TextStyle( color: Theme.of(context).primaryColorDark ), ),
-                  ],)
-                ],
+              elevation: 5,
+              margin: EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 5
               ),
-            );  //end of return with semicolon
+              child: ListTile(
+                leading: CircleAvatar(
+                  radius: 30,
+                  child: Padding(
+                    padding: EdgeInsets.all(6),
+                    child: FittedBox(
+                      child: Text('\$${transactions[index].amount}')
+                    ),
+                  ),
+                ),
+                title: Text(
+                  transactions[index].title,
+                  style: Theme.of(context).textTheme.title,
+                ),
+                subtitle: Text(
+                  DateFormat.yMMMd().format(transactions[index].date)
+                ),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  color: Theme.of(context).errorColor,  //default is red
+                  onPressed: () => {deleteTransaction(transactions[index].id)},
+                ),
+              ),
+            );
+
+            // // we dont need .map.toList() anymore because itemBuilder and itemCount
+            // return Card(
+            //   child: Row(
+            //     children: <Widget>[
+            //       // Price widget
+            //       Container(
+            //         margin: EdgeInsets.symmetric( vertical: 20, horizontal: 15 ),
+            //         child: Text(
+            //           '\$${transactions[index].amount.toStringAsFixed(2)}',  
+            //           // $ 69.99999 -> $ 70.00 (fixed 2 fraction digits) 
+            //           // $ should be backslashed to can be shown
+            //           style: TextStyle(
+            //             fontWeight: FontWeight.bold,
+            //             fontSize: 20,
+            //             color: Theme.of(context).primaryColorDark
+            //           ), ),
+            //         decoration: BoxDecoration( border: Border.all(color: Theme.of(context).primaryColorDark, width: 2, )),
+            //         padding: EdgeInsets.all(10),
+            //       ),
+                  
+            //       // Title and date widget
+            //       Column(
+            //         crossAxisAlignment: CrossAxisAlignment.start, // make content to the left
+            //         children: <Widget>[
+            //           Text(transactions[index].title, style: Theme.of(context).textTheme.title,),
+            //           Text( DateFormat.yMMMd().format(transactions[index].date), style: TextStyle( color: Theme.of(context).primaryColorDark ), ),
+            //       ],)
+            //     ],
+            //   ),
+            // );  //end of return with semicolon
           },  // itemBuilder is REQUIRED in ListView.builder
         ),
     );
