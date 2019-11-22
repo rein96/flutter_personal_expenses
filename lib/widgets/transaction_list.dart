@@ -17,11 +17,11 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 450,  // to make it fix on the screen // ListView needs height and Container!
-      child: transactions.isEmpty 
+    return transactions.isEmpty 
         // BIG ZZZ PICTURE
-        ? Column(
+        ? LayoutBuilder(builder: (ctx, constraints) {
+          // constraints from Container height MediaQuery
+          return Column(
             children: <Widget>[
             Text(
               'No transactions added yet!',
@@ -29,10 +29,11 @@ class TransactionList extends StatelessWidget {
             ),
             SizedBox(height: 20,),  //SizedBox = separator
             Container(
-              height: 200,
+              height: constraints.maxHeight * 0.7,
               child: Image.asset('assets/images/waiting.png', fit: BoxFit.cover,))  // BoxFit reflect to height:200
             ],
-          ) 
+          ); 
+        },)
 
         // If there is transaction(s)
         : ListView.builder(  //was Column()  // ListView = Column + SingleChildScrollView
@@ -100,7 +101,6 @@ class TransactionList extends StatelessWidget {
             //   ),
             // );  //end of return with semicolon
           },  // itemBuilder is REQUIRED in ListView.builder
-        ),
-    );
+        );
   }
 }

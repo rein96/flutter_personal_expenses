@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart'; // for SystemChrome
 
 import 'package:expenses/widgets/chart.dart';
 import 'package:expenses/widgets/transaction_list.dart';
@@ -8,7 +9,16 @@ import './models/transaction.dart';
 // import 'package:expenses/widgets/transaction_list.dart';
 // import 'package:expenses/widgets/new_transaction.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  // To setting the phone only available at portrait (up and down)
+  // when the phone is rotated, it is still the portrait mode
+  // SystemChrome.setPreferredOrientations([
+  //   DeviceOrientation.portraitUp,
+  //   DeviceOrientation.portraitDown
+  // ]);
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -59,6 +69,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  bool _isShowChart = false;
   final List<Transaction> _userTransactions = [
     // Transaction( id : 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now() ),
     // Transaction( id : 't2', title: 'Weekly Groceries', amount: 16.53, date: DateTime.now() ),
@@ -106,8 +117,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+
+    final isLandScape = MediaQuery.of(context).orientation == Orientation.landscape;
+
+    final appBarObj = AppBar(
         title: Text('Personal Expenses'),
         actions: <Widget>[
           IconButton(
@@ -115,14 +128,54 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () => _startAddNewTransaction(context),  // from BuildContext context
           )
         ],
-      ),
+    );
+
+    final chartWidget = Container(
+                  // MediaQuery.of(context).size.height = size of the phone ?
+                  // appBarObj.preferredSize.height = size of the appBar
+                  // MediaQuery.of(context).padding.top = size of the status bar
+                  height: ( MediaQuery.of(context).size.height - appBarObj.preferredSize.height - MediaQuery.of(context).padding.top ) *  (isLandScape ? 0.7 : 0.3), // was 0.3
+                  child: Chart(_recentTransactions)
+                );
+
+    final transactionListWidget = Container(
+                  height: ( MediaQuery.of(context).size.height - appBarObj.preferredSize.height - MediaQuery.of(context).padding.top ) * 0.7,
+                  child: TransactionList(_userTransactions, _deleteTransactions)
+                );
+
+    print('appBarObj.preferredSize.height = ${appBarObj.preferredSize.height}');
+
+    return Scaffold(
+      appBar: appBarObj,
       body: SingleChildScrollView(  // When the phone is roated, the screen can be scrolled correctly
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Chart(_recentTransactions),
-              TransactionList(_userTransactions, _deleteTransactions)
+              
+              // Landscape = Show switch Chart
+              if (isLandScape)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text('Show Chart'),
+                  Switch(value: _isShowChart, onChanged: (val) {
+                    setState(() {
+                      _isShowChart = val;
+                    });
+                  },)
+                ],
+              ),
+
+              // Portrait mode = show chart + transactionlist
+              if (isLandScape == false) chartWidget,
+              if (isLandScape == false) transactionListWidget,
+
+              // Landscape = chart or transactionList based on Show Chart switch boolean
+              if (isLandScape)
+              _isShowChart 
+              ? chartWidget
+              : transactionListWidget
             ],
           ),
       ),
