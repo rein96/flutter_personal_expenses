@@ -1,3 +1,6 @@
+import 'dart:io'; // Platform.isIOS
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/services.dart'; // for SystemChrome
 
@@ -23,7 +26,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp( // we can use CupertinoApp() for iOS
       title: 'Personal Expenses!',
       theme: ThemeData(
         // primarySwatch = generates different shades of the color (lighter or darker)
@@ -115,12 +118,27 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // render
   @override
   Widget build(BuildContext context) {
+    final myMediaQuery = MediaQuery.of(context);
 
     final isLandScape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-    final appBarObj = AppBar(
+    //ObstructingPreferredSizeWidget = Ctrl + Click on CupertinoNavigationBar()
+    final PreferredSizeWidget myAppBar = Platform.isIOS 
+      ? CupertinoNavigationBar(
+          middle: Text('Personal Expenses'), // middle (CupertinoNavigationBar) == title (AppBar)
+          trailing: Row(  // trailing needs to adjust the mainAxisSize to fix Title + Icon place correctly
+            mainAxisSize: MainAxisSize.min, // default is .max
+            children: <Widget>[
+              GestureDetector(  // GestureDetector == IconButton on AppBar
+                child: Icon(CupertinoIcons.add),
+                onTap: () => _startAddNewTransaction(context),
+              )
+            ],),
+        ) 
+      : AppBar(
         title: Text('Personal Expenses'),
         actions: <Widget>[
           IconButton(
@@ -132,55 +150,71 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final chartWidget = Container(
                   // MediaQuery.of(context).size.height = size of the phone ?
-                  // appBarObj.preferredSize.height = size of the appBar
+                  // myAppBar.preferredSize.height = size of the appBar
                   // MediaQuery.of(context).padding.top = size of the status bar
-                  height: ( MediaQuery.of(context).size.height - appBarObj.preferredSize.height - MediaQuery.of(context).padding.top ) *  (isLandScape ? 0.7 : 0.3), // was 0.3
+                  height: ( myMediaQuery.size.height - myAppBar.preferredSize.height - myMediaQuery.padding.top ) *  (isLandScape ? 0.7 : 0.3), // was 0.3
                   child: Chart(_recentTransactions)
                 );
 
     final transactionListWidget = Container(
-                  height: ( MediaQuery.of(context).size.height - appBarObj.preferredSize.height - MediaQuery.of(context).padding.top ) * 0.7,
+                  height: ( myMediaQuery.size.height - myAppBar.preferredSize.height - myMediaQuery.padding.top ) * 0.7,
                   child: TransactionList(_userTransactions, _deleteTransactions)
                 );
 
-    print('appBarObj.preferredSize.height = ${appBarObj.preferredSize.height}');
+    final myPageBody = SafeArea( 
+      // SafeArea to adjust the size of the app so that we respect some reserved areas (top iphone X status bar, etc)
+      child: SingleChildScrollView(  // When the phone is roated, the screen can be scrolled correctly
+        child: Column(
+          // mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            
+            // Landscape = Show switch Chart
+            if (isLandScape)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Show Chart', 
+                  style: Theme.of(context).textTheme.title, // is defined to theme iOS Text
+                ),
+                Switch.adaptive(  //.adaptive = to make iOS switch or android switch
+                  activeColor: Theme.of(context).accentColor,
+                  value: _isShowChart,
+                  onChanged: (val) {
+                  setState(() {
+                    _isShowChart = val;
+                  });
+                },)
+              ],
+            ),
 
-    return Scaffold(
-      appBar: appBarObj,
-      body: SingleChildScrollView(  // When the phone is roated, the screen can be scrolled correctly
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              
-              // Landscape = Show switch Chart
-              if (isLandScape)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text('Show Chart'),
-                  Switch(value: _isShowChart, onChanged: (val) {
-                    setState(() {
-                      _isShowChart = val;
-                    });
-                  },)
-                ],
-              ),
+            // Portrait mode = show chart + transactionlist
+            if (isLandScape == false) chartWidget,
+            if (isLandScape == false) transactionListWidget,
 
-              // Portrait mode = show chart + transactionlist
-              if (isLandScape == false) chartWidget,
-              if (isLandScape == false) transactionListWidget,
-
-              // Landscape = chart or transactionList based on Show Chart switch boolean
-              if (isLandScape)
-              _isShowChart 
-              ? chartWidget
-              : transactionListWidget
-            ],
-          ),
+            // Landscape = chart or transactionList based on Show Chart switch boolean
+            if (isLandScape)
+            _isShowChart 
+            ? chartWidget
+            : transactionListWidget
+          ],
+        ),
       ),
+    );
+
+    print('myAppBar.preferredSize.height = ${myAppBar.preferredSize.height}');
+
+    return Platform.isIOS 
+    ? CupertinoPageScaffold(
+        child: myPageBody, // child (Cupertino) == body (Scaffold)
+        navigationBar: myAppBar,
+      ) 
+    : Scaffold(
+      appBar: myAppBar,
+      body: myPageBody,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: Platform.isIOS ? Container() : FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () => _startAddNewTransaction(context),  // from BuildContext context
       ),
