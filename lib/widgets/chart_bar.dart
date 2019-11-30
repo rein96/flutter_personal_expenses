@@ -5,7 +5,9 @@ class ChartBar extends StatelessWidget {
   final double spendingAmount;
   final double spendingPercentageOfTotal;
 
-  ChartBar({this.label, this.spendingAmount, this.spendingPercentageOfTotal});
+  const ChartBar({this.label, this.spendingAmount, this.spendingPercentageOfTotal});
+  // CharBar constructor using const = to tell fluttter it is immutable
+  // Constructor with const should match with "final" arguments
 
   @override
   Widget build(BuildContext context) {
