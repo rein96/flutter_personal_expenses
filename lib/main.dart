@@ -167,10 +167,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           // mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
+          children: <Widget>[            
             
             // Landscape = Show switch Chart
-            if (isLandScape)
+            if (isLandScape) 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -189,15 +189,16 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
 
+            // Landscape = chart or transactionList based on Show Chart switch boolean
+            if (isLandScape)
+              _isShowChart 
+            ? chartWidget
+            : transactionListWidget,
+
             // Portrait mode = show chart + transactionlist
             if (isLandScape == false) chartWidget,
             if (isLandScape == false) transactionListWidget,
 
-            // Landscape = chart or transactionList based on Show Chart switch boolean
-            if (isLandScape)
-            _isShowChart 
-            ? chartWidget
-            : transactionListWidget
           ],
         ),
       ),

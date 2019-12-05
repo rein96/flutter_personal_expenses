@@ -37,42 +37,14 @@ class TransactionList extends StatelessWidget {
         },)
 
         // If there is transaction(s)
-        : ListView.builder(  //was Column()  // ListView = Column + SingleChildScrollView
-          itemCount: transactions.length,
-          itemBuilder: (context, index) {
-            return TransactionItem(transaction: transactions[index], deleteTransaction: deleteTransaction);
-
-            // // we dont need .map.toList() anymore because itemBuilder and itemCount
-            // return Card(
-            //   child: Row(
-            //     children: <Widget>[
-            //       // Price widget
-            //       Container(
-            //         margin: EdgeInsets.symmetric( vertical: 20, horizontal: 15 ),
-            //         child: Text(
-            //           '\$${transactions[index].amount.toStringAsFixed(2)}',  
-            //           // $ 69.99999 -> $ 70.00 (fixed 2 fraction digits) 
-            //           // $ should be backslashed to can be shown
-            //           style: TextStyle(
-            //             fontWeight: FontWeight.bold,
-            //             fontSize: 20,
-            //             color: Theme.of(context).primaryColorDark
-            //           ), ),
-            //         decoration: BoxDecoration( border: Border.all(color: Theme.of(context).primaryColorDark, width: 2, )),
-            //         padding: EdgeInsets.all(10),
-            //       ),
-                  
-            //       // Title and date widget
-            //       Column(
-            //         crossAxisAlignment: CrossAxisAlignment.start, // make content to the left
-            //         children: <Widget>[
-            //           Text(transactions[index].title, style: Theme.of(context).textTheme.title,),
-            //           Text( DateFormat.yMMMd().format(transactions[index].date), style: TextStyle( color: Theme.of(context).primaryColorDark ), ),
-            //       ],)
-            //     ],
-            //   ),
-            // );  //end of return with semicolon
-          },  // itemBuilder is REQUIRED in ListView.builder
-        );
+        : ListView(
+            children: transactions.map( (tx) => TransactionItem( key: ValueKey(tx.id), transaction: tx, deleteTransaction: deleteTransaction,) ).toList(),
+          );
+        
+        // ListView.builder is not used in order to give 'Key' in TransactionItem
+        // ListView.builder(  //was Column()  // ListView = Column + SingleChildScrollView
+        //   itemCount: transactions.length,
+        //   itemBuilder: (context, index) {
+        //     return TransactionItem(transaction: transactions[index], deleteTransaction: deleteTransaction);
   }
 }
